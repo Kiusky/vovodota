@@ -16,8 +16,7 @@ Totalmente otimizada para smartphones, tablets e telas menores.
 
 HTML, CSS e scripts bem estruturados, permitindo evolução futura da página com facilidade.
 
-
-[![Imagem do VOVODOTA](https://github.com/user-attachments/assets/152cbafb-dd1d-43ae-b073-272c3294b38a)](https://kiusky.github.io/vovodota)
+[![Imagem do VOVODOTA](https://github.com/user-attachments/assets/c48fd81d-bd17-42b0-8d1f-08070397789d)](https://kiusky.github.io/vovodota)
 
 📋 Objetivo da Página
 
