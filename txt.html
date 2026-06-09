@@ -19,7 +19,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to right, #0a3b0a, #0a1f3d, #1a1a1a, #3d0a0a);
+            background: linear-gradient(
+                to right,
+                #0a3b0a,
+                #0a1f3d,
+                #1a1a1a,
+                #3d0a0a
+            );
             display: flex;
             justify-content: center;
             align-items: center;
@@ -53,6 +59,7 @@
 
 <div class="wrapper">
     <div class="container">
+
         <img src="imagem/vovodota.gif" class="name-img" draggable="false">
         <img src="imagem/vovo.png" class="fade-img clickable-img" draggable="false">
 
@@ -87,42 +94,52 @@
            style="background:#158f43; color:white; transition:0.3s;">
             <i class="fab fa-whatsapp"></i> WhatsApp
         </a>
+
     </div>
 </div>
 
 <script>
+// BLOQUEIO TOTAL DE MOUSE E TECLADO ENQUANTO LOADER EXISTIR
 (function() {
     const loader = document.getElementById("loader");
     
+    // Verifica se o loader ainda está visível na tela
     function isLoaderVisible() {
         return loader && loader.style.display !== "none";
     }
     
-    const mouseEvents = ['click', 'mousedown', 'mouseup', 'contextmenu', 'dblclick'];
+    // BLOQUEIA TODOS OS EVENTOS DO MOUSE
+    const mouseEvents = ['click', 'mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mouseover', 'mouseout', 'drag', 'dragstart', 'dragend', 'drop', 'contextmenu', 'dblclick'];
     
     function blockMouseEvent(e) {
         if (isLoaderVisible()) {
             e.preventDefault();
             e.stopPropagation();
+            return false;
         }
     }
     
-    const keyboardEvents = ['keydown', 'keyup'];
+    // BLOQUEIA TODOS OS EVENTOS DO TECLADO
+    const keyboardEvents = ['keydown', 'keyup', 'keypress'];
     
     function blockKeyboardEvent(e) {
         if (isLoaderVisible()) {
             e.preventDefault();
             e.stopPropagation();
+            return false;
         }
     }
     
+    // BLOQUEIA SCROLL DO MOUSE E RODINHA
     function blockWheel(e) {
         if (isLoaderVisible()) {
             e.preventDefault();
             e.stopPropagation();
+            return false;
         }
     }
     
+    // Aplica todos os bloqueios
     mouseEvents.forEach(eventType => {
         document.addEventListener(eventType, blockMouseEvent, true);
     });
@@ -131,11 +148,14 @@
         document.addEventListener(eventType, blockKeyboardEvent, true);
     });
     
+    // Bloqueia scroll da roda do mouse
     document.addEventListener('wheel', blockWheel, { passive: false, capture: true });
     document.addEventListener('touchmove', blockWheel, { passive: false, capture: true });
     
+    // Remove todos os bloqueios quando o loader sumir
     const observer = new MutationObserver(function() {
         if (loader.style.display === "none") {
+            // Remove todos os bloqueios
             mouseEvents.forEach(eventType => {
                 document.removeEventListener(eventType, blockMouseEvent, true);
             });
@@ -151,6 +171,7 @@
     observer.observe(loader, { attributes: true });
 })();
 
+// Código original do loader
 window.addEventListener("load", function () {
     const loader = document.getElementById("loader");
     
