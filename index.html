@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        * {
+            user-select: none;
+        }
+        
         #loader {
             position: fixed;
             top: 0;
@@ -25,6 +29,19 @@
             justify-content: center;
             align-items: center;
             z-index: 999999;
+            pointer-events: all;
+        }
+
+        #blockOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 999998;
+            display: none;
+            pointer-events: all;
         }
 
         .loader-icon {
@@ -38,13 +55,27 @@
             50% { transform: scale(1.15); opacity: 1; }
             100% { transform: scale(1); opacity: .7; }
         }
+        
+        body.loading {
+            pointer-events: none;
+        }
+        
+        body.loading .container {
+            pointer-events: none;
+        }
+        
+        body.loaded {
+            pointer-events: auto;
+        }
     </style>
 </head>
-<body>
+<body class="loading">
 
 <div id="loader">
     <img src="imagem/ic-vovo.png" class="loader-icon" draggable="false">
 </div>
+
+<div id="blockOverlay"></div>
 
 <div id="audioControls">
     <div id="muteBtn"><i class="fas fa-volume-mute" style="color:gray;"></i></div>
@@ -76,54 +107,6 @@
                 100% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
             }
         </style>
-
-        <script>
-            const ANIVERSARIO_MES = 6;
-            const ANIVERSARIO_DIA = 16;
-            
-            function isAniversarioHoje(data) {
-                return data.getMonth() + 1 === ANIVERSARIO_MES && data.getDate() === ANIVERSARIO_DIA;
-            }
-            
-            function updateCountdown() {
-                const hoje = new Date();
-                const anoAtual = hoje.getFullYear();
-                let dataAniversario = new Date(anoAtual, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
-                
-                if (hoje > dataAniversario && !isAniversarioHoje(hoje)) {
-                    dataAniversario = new Date(anoAtual + 1, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
-                }
-                
-                const diff = dataAniversario - hoje;
-                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const horas = Math.floor((diff % 86400000) / 3600000);
-                const minutos = Math.floor((diff % 3600000) / 60000);
-                const segundos = Math.floor((diff % 60000) / 1000);
-                
-                const countdownElement = document.getElementById('countdown');
-                const alarmTextElement = document.getElementById('alarmText');
-                const spanElement = alarmTextElement.querySelector('span:first-child');
-                
-                if (isAniversarioHoje(hoje)) {
-                    spanElement.innerHTML = '🎉';
-                    countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
-                    alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
-                } else if (dias === 0 && horas === 0 && minutos === 0 && segundos < 30) {
-                    spanElement.innerHTML = '🎉';
-                    countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
-                    alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
-                } else if (dias === 0) {
-                    spanElement.innerHTML = 'Faltam';
-                    countdownElement.innerHTML = `${horas}h ${minutos}m ${segundos}s`;
-                } else {
-                    spanElement.innerHTML = 'Faltam';
-                    countdownElement.innerHTML = `${dias} dias, ${horas}h ${minutos}m ${segundos}s`;
-                }
-            }
-            
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-        </script>
 
         <a id="steamLink" class="btn steam" href="https://steamcommunity.com/profiles/76561198268358383/" target="_blank" rel="noopener noreferrer">
             <i class="fab fa-steam"></i> Steam
@@ -161,11 +144,122 @@
 </div>
 
 <script>
-window.addEventListener("load", function () {
+const ANIVERSARIO_MES = 6;
+const ANIVERSARIO_DIA = 16;
+
+function isAniversarioHoje(data) {
+    return data.getMonth() + 1 === ANIVERSARIO_MES && data.getDate() === ANIVERSARIO_DIA;
+}
+
+function updateCountdown() {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    let dataAniversario = new Date(anoAtual, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
+    
+    if (hoje > dataAniversario && !isAniversarioHoje(hoje)) {
+        dataAniversario = new Date(anoAtual + 1, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
+    }
+    
+    const diff = dataAniversario - hoje;
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    const minutos = Math.floor((diff % 3600000) / 60000);
+    const segundos = Math.floor((diff % 60000) / 1000);
+    
+    const countdownElement = document.getElementById('countdown');
+    const alarmTextElement = document.getElementById('alarmText');
+    const spanElement = alarmTextElement.querySelector('span:first-child');
+    
+    if (isAniversarioHoje(hoje)) {
+        spanElement.innerHTML = '🎉';
+        countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
+        alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
+    } else if (dias === 0 && horas === 0 && minutos === 0 && segundos < 30) {
+        spanElement.innerHTML = '🎉';
+        countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
+        alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
+    } else if (dias === 0) {
+        spanElement.innerHTML = 'Faltam';
+        countdownElement.innerHTML = `${horas}h ${minutos}m ${segundos}s`;
+    } else {
+        spanElement.innerHTML = 'Faltam';
+        countdownElement.innerHTML = `${dias} dias, ${horas}h ${minutos}m ${segundos}s`;
+    }
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+(function() {
     const loader = document.getElementById("loader");
-    loader.style.opacity = "0";
-    setTimeout(() => loader.style.display = "none", 300);
-});
+    const blockOverlay = document.getElementById("blockOverlay");
+    
+    blockOverlay.style.display = "block";
+    
+    function removeAllBlocks() {
+        if (blockOverlay) {
+            blockOverlay.style.display = "none";
+        }
+        
+        document.body.classList.remove("loading");
+        document.body.classList.add("loaded");
+        
+        document.body.style.pointerEvents = "auto";
+        
+        setTimeout(() => {
+            window.getComputedStyle(document.body);
+        }, 10);
+    }
+    
+    window.addEventListener("load", function () {
+        setTimeout(function() {
+            loader.style.opacity = "0";
+            loader.style.transition = "opacity 0.3s";
+            
+            setTimeout(function() {
+                loader.style.display = "none";
+                removeAllBlocks();
+            }, 300);
+        }, 100);
+    });
+    
+    setTimeout(function() {
+        if (loader.style.display !== "none") {
+            loader.style.display = "none";
+            removeAllBlocks();
+        }
+    }, 3000);
+})();
+
+document.addEventListener('click', function(e) {
+    const overlay = document.getElementById("blockOverlay");
+    
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+}, true);
+
+document.addEventListener('keydown', function(e) {
+    const overlay = document.getElementById("blockOverlay");
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+}, true);
+
+document.addEventListener('wheel', function(e) {
+    const overlay = document.getElementById("blockOverlay");
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+}, { passive: false, capture: true });
 </script>
 
 <script src="script.js"></script>
