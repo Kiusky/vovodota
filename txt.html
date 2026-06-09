@@ -19,18 +19,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                to right,
-                #0a3b0a,
-                #0a1f3d,
-                #1a1a1a,
-                #3d0a0a
-            );
+            background: linear-gradient(to right, #0a3b0a, #0a1f3d, #1a1a1a, #3d0a0a);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 999999;
-            pointer-events: all;
         }
 
         .loader-icon {
@@ -99,82 +92,21 @@
 </div>
 
 <script>
-// BLOQUEIO TOTAL DE MOUSE E TECLADO ENQUANTO LOADER EXISTIR
-(function() {
-    const loader = document.getElementById("loader");
-    
-    // Verifica se o loader ainda está visível na tela
-    function isLoaderVisible() {
-        return loader && loader.style.display !== "none";
-    }
-    
-    // BLOQUEIA TODOS OS EVENTOS DO MOUSE
-    const mouseEvents = ['click', 'mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mouseover', 'mouseout', 'drag', 'dragstart', 'dragend', 'drop', 'contextmenu', 'dblclick'];
-    
-    function blockMouseEvent(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    
-    // BLOQUEIA TODOS OS EVENTOS DO TECLADO
-    const keyboardEvents = ['keydown', 'keyup', 'keypress'];
-    
-    function blockKeyboardEvent(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    
-    // BLOQUEIA SCROLL DO MOUSE E RODINHA
-    function blockWheel(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    
-    // Aplica todos os bloqueios
-    mouseEvents.forEach(eventType => {
-        document.addEventListener(eventType, blockMouseEvent, true);
-    });
-    
-    keyboardEvents.forEach(eventType => {
-        document.addEventListener(eventType, blockKeyboardEvent, true);
-    });
-    
-    // Bloqueia scroll da roda do mouse
-    document.addEventListener('wheel', blockWheel, { passive: false, capture: true });
-    document.addEventListener('touchmove', blockWheel, { passive: false, capture: true });
-    
-    // Remove todos os bloqueios quando o loader sumir
-    const observer = new MutationObserver(function() {
-        if (loader.style.display === "none") {
-            // Remove todos os bloqueios
-            mouseEvents.forEach(eventType => {
-                document.removeEventListener(eventType, blockMouseEvent, true);
-            });
-            keyboardEvents.forEach(eventType => {
-                document.removeEventListener(eventType, blockKeyboardEvent, true);
-            });
-            document.removeEventListener('wheel', blockWheel, true);
-            document.removeEventListener('touchmove', blockWheel, true);
-            observer.disconnect();
-        }
-    });
-    
-    observer.observe(loader, { attributes: true });
-})();
+const loader = document.getElementById("loader");
 
-// Código original do loader
+function bloquearTudo(e) {
+    if (loader.style.display !== "none") {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}
+
+document.addEventListener('click', bloquearTudo, true);
+document.addEventListener('keydown', bloquearTudo, true);
+document.addEventListener('wheel', bloquearTudo, { passive: false, capture: true });
+document.addEventListener('touchmove', bloquearTudo, { passive: false, capture: true });
+
 window.addEventListener("load", function () {
-    const loader = document.getElementById("loader");
-    
     setTimeout(function() {
         loader.style.opacity = "0";
         loader.style.transition = "opacity 0.3s";
