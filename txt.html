@@ -24,6 +24,7 @@
             justify-content: center;
             align-items: center;
             z-index: 999999;
+            pointer-events: all;
         }
 
         .loader-icon {
@@ -52,7 +53,6 @@
 
 <div class="wrapper">
     <div class="container">
-
         <img src="imagem/vovodota.gif" class="name-img" draggable="false">
         <img src="imagem/vovo.png" class="fade-img clickable-img" draggable="false">
 
@@ -87,31 +87,79 @@
            style="background:#158f43; color:white; transition:0.3s;">
             <i class="fab fa-whatsapp"></i> WhatsApp
         </a>
-
     </div>
 </div>
 
 <script>
-const loader = document.getElementById('loader');
-
-function bloquear(e) {
-    if (loader.style.display !== 'none') {
-        e.preventDefault();
-        e.stopPropagation();
+(function() {
+    const loader = document.getElementById("loader");
+    
+    function isLoaderVisible() {
+        return loader && loader.style.display !== "none";
     }
-}
+    
+    const mouseEvents = ['click', 'mousedown', 'mouseup', 'contextmenu', 'dblclick'];
+    
+    function blockMouseEvent(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+    
+    const keyboardEvents = ['keydown', 'keyup'];
+    
+    function blockKeyboardEvent(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+    
+    function blockWheel(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+    
+    mouseEvents.forEach(eventType => {
+        document.addEventListener(eventType, blockMouseEvent, true);
+    });
+    
+    keyboardEvents.forEach(eventType => {
+        document.addEventListener(eventType, blockKeyboardEvent, true);
+    });
+    
+    document.addEventListener('wheel', blockWheel, { passive: false, capture: true });
+    document.addEventListener('touchmove', blockWheel, { passive: false, capture: true });
+    
+    const observer = new MutationObserver(function() {
+        if (loader.style.display === "none") {
+            mouseEvents.forEach(eventType => {
+                document.removeEventListener(eventType, blockMouseEvent, true);
+            });
+            keyboardEvents.forEach(eventType => {
+                document.removeEventListener(eventType, blockKeyboardEvent, true);
+            });
+            document.removeEventListener('wheel', blockWheel, true);
+            document.removeEventListener('touchmove', blockWheel, true);
+            observer.disconnect();
+        }
+    });
+    
+    observer.observe(loader, { attributes: true });
+})();
 
-document.addEventListener('click', bloquear, true);
-document.addEventListener('keydown', bloquear, true);
-document.addEventListener('wheel', bloquear, { passive: false, capture: true });
-document.addEventListener('touchmove', bloquear, { passive: false, capture: true });
-
-window.addEventListener('load', function() {
+window.addEventListener("load", function () {
+    const loader = document.getElementById("loader");
+    
     setTimeout(function() {
-        loader.style.opacity = '0';
-        loader.style.transition = 'opacity 0.3s';
+        loader.style.opacity = "0";
+        loader.style.transition = "opacity 0.3s";
+        
         setTimeout(function() {
-            loader.style.display = 'none';
+            loader.style.display = "none";
         }, 300);
     }, 100);
 });
