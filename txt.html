@@ -26,13 +26,11 @@
                 #1a1a1a,
                 #3d0a0a
             );
-            box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.55);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 999999;
-            /* IMPEDE QUALQUER CLIQUE NA PÁGINA ENQUANTO ESTIVER VISÍVEL */
-            pointer-events: auto;
+            pointer-events: all;
         }
 
         .loader-icon {
@@ -45,12 +43,6 @@
             0% { transform: scale(1); opacity: .7; }
             50% { transform: scale(1.15); opacity: 1; }
             100% { transform: scale(1); opacity: .7; }
-        }
-
-        /* IMPEDIR SCROLL ENQUANTO LOADER ESTIVER ATIVO */
-        body.loading {
-            overflow: hidden;
-            height: 100vh;
         }
     </style>
 </head>
@@ -107,54 +99,91 @@
 </div>
 
 <script>
-window.addEventListener("load", function () {
-    const loader = document.getElementById("loader");
-    
-    // Pequeno delay para garantir que tudo foi processado
-    setTimeout(function() {
-        loader.style.opacity = "0";
-        
-        // Aguarda a transição de opacidade e remove o loader
-        setTimeout(function() {
-            loader.style.display = "none";
-            // Remove a classe de scroll bloqueado
-            document.body.classList.remove("loading");
-        }, 300);
-    }, 100);
-});
-
-// IMPEDIR INTERAÇÃO ENQUANTO LOADER ESTIVER NA TELA
+// BLOQUEIO TOTAL DE MOUSE E TECLADO ENQUANTO LOADER EXISTIR
 (function() {
     const loader = document.getElementById("loader");
     
-    // Adiciona classe no body para bloquear scroll
-    document.body.classList.add("loading");
+    // Verifica se o loader ainda está visível na tela
+    function isLoaderVisible() {
+        return loader && loader.style.display !== "none";
+    }
     
-    // Bloqueia todos os cliques nos links e botões enquanto loader estiver visível
-    function bloquearCliques(event) {
-        // Se o loader ainda está visível (display não é none)
-        if (loader && loader.style.display !== "none") {
-            event.preventDefault();
-            event.stopPropagation();
+    // BLOQUEIA TODOS OS EVENTOS DO MOUSE
+    const mouseEvents = ['click', 'mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mouseover', 'mouseout', 'drag', 'dragstart', 'dragend', 'drop', 'contextmenu', 'dblclick'];
+    
+    function blockMouseEvent(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
             return false;
         }
     }
     
-    // Bloqueia cliques em toda a página
-    document.addEventListener("click", bloquearCliques, true);
-    document.addEventListener("touchstart", bloquearCliques, true);
+    // BLOQUEIA TODOS OS EVENTOS DO TECLADO
+    const keyboardEvents = ['keydown', 'keyup', 'keypress'];
     
-    // Remove o bloqueio quando o loader sumir
+    function blockKeyboardEvent(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+    
+    // BLOQUEIA SCROLL DO MOUSE E RODINHA
+    function blockWheel(e) {
+        if (isLoaderVisible()) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+    
+    // Aplica todos os bloqueios
+    mouseEvents.forEach(eventType => {
+        document.addEventListener(eventType, blockMouseEvent, true);
+    });
+    
+    keyboardEvents.forEach(eventType => {
+        document.addEventListener(eventType, blockKeyboardEvent, true);
+    });
+    
+    // Bloqueia scroll da roda do mouse
+    document.addEventListener('wheel', blockWheel, { passive: false, capture: true });
+    document.addEventListener('touchmove', blockWheel, { passive: false, capture: true });
+    
+    // Remove todos os bloqueios quando o loader sumir
     const observer = new MutationObserver(function() {
         if (loader.style.display === "none") {
-            document.removeEventListener("click", bloquearCliques, true);
-            document.removeEventListener("touchstart", bloquearCliques, true);
+            // Remove todos os bloqueios
+            mouseEvents.forEach(eventType => {
+                document.removeEventListener(eventType, blockMouseEvent, true);
+            });
+            keyboardEvents.forEach(eventType => {
+                document.removeEventListener(eventType, blockKeyboardEvent, true);
+            });
+            document.removeEventListener('wheel', blockWheel, true);
+            document.removeEventListener('touchmove', blockWheel, true);
             observer.disconnect();
         }
     });
     
     observer.observe(loader, { attributes: true });
 })();
+
+// Código original do loader
+window.addEventListener("load", function () {
+    const loader = document.getElementById("loader");
+    
+    setTimeout(function() {
+        loader.style.opacity = "0";
+        loader.style.transition = "opacity 0.3s";
+        
+        setTimeout(function() {
+            loader.style.display = "none";
+        }, 300);
+    }, 100);
+});
 </script>
 
 <script src="script.js"></script>
