@@ -14,7 +14,7 @@
 
     <style>
         * {
-            user-select: none; /* Evita seleção de texto durante o load */
+            user-select: none;
         }
         
         #loader {
@@ -34,10 +34,9 @@
             justify-content: center;
             align-items: center;
             z-index: 999999;
-            pointer-events: all; /* Captura todos os cliques */
+            pointer-events: all;
         }
 
-        /* OVERLAY DE BLOQUEIO FÍSICO */
         #blockOverlay {
             position: fixed;
             top: 0;
@@ -47,7 +46,7 @@
             background: transparent;
             z-index: 999998;
             display: none;
-            pointer-events: all; /* BLOQUEIA QUALQUER CLIQUE */
+            pointer-events: all;
         }
 
         .loader-icon {
@@ -62,7 +61,6 @@
             100% { transform: scale(1); opacity: .7; }
         }
         
-        /* Garante que nada seja clicável durante o load */
         body.loading {
             pointer-events: none;
         }
@@ -71,7 +69,6 @@
             pointer-events: none;
         }
         
-        /* Quando o load acabar */
         body.loaded {
             pointer-events: auto;
         }
@@ -83,7 +80,6 @@
     <img src="imagem/ic-vovo.png" class="loader-icon" draggable="false">
 </div>
 
-<!-- OVERLAY QUE BLOQUEIA FISICAMENTE OS CLIQUES -->
 <div id="blockOverlay"></div>
 
 <div id="audioControls">
@@ -133,45 +129,33 @@
 </div>
 
 <script>
-// SOLUÇÃO DEFINITIVA - NENHUM CLIQUE SERÁ LEMBRADO
 
 (function() {
     const loader = document.getElementById("loader");
     const blockOverlay = document.getElementById("blockOverlay");
     
-    // Mostra o overlay de bloqueio imediatamente
     blockOverlay.style.display = "block";
     
-    // Função para remover completamente todos os bloqueios
     function removeAllBlocks() {
-        // Esconde o overlay
         if (blockOverlay) {
             blockOverlay.style.display = "none";
         }
         
-        // Remove a classe de loading do body
         document.body.classList.remove("loading");
         document.body.classList.add("loaded");
         
-        // Libera os ponteiros do body
         document.body.style.pointerEvents = "auto";
         
-        // Remove qualquer evento remanescente (opcional)
         setTimeout(() => {
-            // Força o navegador a limpar a fila de eventos
             window.getComputedStyle(document.body);
         }, 10);
     }
     
-    // Aguarda o carregamento completo da página
     window.addEventListener("load", function () {
-        // Aguarda mais 100ms para garantir que tudo está pronto
         setTimeout(function() {
-            // Animação de fade out do loader
             loader.style.opacity = "0";
             loader.style.transition = "opacity 0.3s";
             
-            // Após a animação, remove o loader e os bloqueios
             setTimeout(function() {
                 loader.style.display = "none";
                 removeAllBlocks();
@@ -179,7 +163,6 @@
         }, 100);
     });
     
-    // Garantia extra: se algo demorar mais que 3 segundos, força remoção
     setTimeout(function() {
         if (loader.style.display !== "none") {
             loader.style.display = "none";
@@ -188,21 +171,18 @@
     }, 3000);
 })();
 
-// BLOQUEIO EXTRA: Previne qualquer clique durante o load
 document.addEventListener('click', function(e) {
     const loader = document.getElementById("loader");
     const overlay = document.getElementById("blockOverlay");
     
-    // Se o overlay estiver visível, bloqueia TUDO
     if (overlay && overlay.style.display === "block") {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         return false;
     }
-}, true); // true = fase de captura, antes de qualquer outro evento
+}, true);
 
-// Bloqueia também eventos de teclado durante o load
 document.addEventListener('keydown', function(e) {
     const overlay = document.getElementById("blockOverlay");
     if (overlay && overlay.style.display === "block") {
@@ -213,7 +193,6 @@ document.addEventListener('keydown', function(e) {
     }
 }, true);
 
-// Bloqueia scroll durante o load
 document.addEventListener('wheel', function(e) {
     const overlay = document.getElementById("blockOverlay");
     if (overlay && overlay.style.display === "block") {
