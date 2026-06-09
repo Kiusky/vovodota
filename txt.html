@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
+        * {
+            user-select: none; /* Evita seleção de texto durante o load */
+        }
+        
         #loader {
             position: fixed;
             top: 0;
@@ -30,7 +34,20 @@
             justify-content: center;
             align-items: center;
             z-index: 999999;
-            pointer-events: all;
+            pointer-events: all; /* Captura todos os cliques */
+        }
+
+        /* OVERLAY DE BLOQUEIO FÍSICO */
+        #blockOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 999998;
+            display: none;
+            pointer-events: all; /* BLOQUEIA QUALQUER CLIQUE */
         }
 
         .loader-icon {
@@ -44,13 +61,30 @@
             50% { transform: scale(1.15); opacity: 1; }
             100% { transform: scale(1); opacity: .7; }
         }
+        
+        /* Garante que nada seja clicável durante o load */
+        body.loading {
+            pointer-events: none;
+        }
+        
+        body.loading .container {
+            pointer-events: none;
+        }
+        
+        /* Quando o load acabar */
+        body.loaded {
+            pointer-events: auto;
+        }
     </style>
 </head>
-<body>
+<body class="loading">
 
 <div id="loader">
     <img src="imagem/ic-vovo.png" class="loader-icon" draggable="false">
 </div>
+
+<!-- OVERLAY QUE BLOQUEIA FISICAMENTE OS CLIQUES -->
+<div id="blockOverlay"></div>
 
 <div id="audioControls">
     <div id="muteBtn"><i class="fas fa-volume-mute" style="color:gray;"></i></div>
@@ -99,91 +133,95 @@
 </div>
 
 <script>
-// BLOQUEIO TOTAL DE MOUSE E TECLADO ENQUANTO LOADER EXISTIR
+// SOLUÇÃO DEFINITIVA - NENHUM CLIQUE SERÁ LEMBRADO
+
 (function() {
     const loader = document.getElementById("loader");
+    const blockOverlay = document.getElementById("blockOverlay");
     
-    // Verifica se o loader ainda está visível na tela
-    function isLoaderVisible() {
-        return loader && loader.style.display !== "none";
-    }
+    // Mostra o overlay de bloqueio imediatamente
+    blockOverlay.style.display = "block";
     
-    // BLOQUEIA TODOS OS EVENTOS DO MOUSE
-    const mouseEvents = ['click', 'mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mouseover', 'mouseout', 'drag', 'dragstart', 'dragend', 'drop', 'contextmenu', 'dblclick'];
-    
-    function blockMouseEvent(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
+    // Função para remover completamente todos os bloqueios
+    function removeAllBlocks() {
+        // Esconde o overlay
+        if (blockOverlay) {
+            blockOverlay.style.display = "none";
         }
+        
+        // Remove a classe de loading do body
+        document.body.classList.remove("loading");
+        document.body.classList.add("loaded");
+        
+        // Libera os ponteiros do body
+        document.body.style.pointerEvents = "auto";
+        
+        // Remove qualquer evento remanescente (opcional)
+        setTimeout(() => {
+            // Força o navegador a limpar a fila de eventos
+            window.getComputedStyle(document.body);
+        }, 10);
     }
     
-    // BLOQUEIA TODOS OS EVENTOS DO TECLADO
-    const keyboardEvents = ['keydown', 'keyup', 'keypress'];
-    
-    function blockKeyboardEvent(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    
-    // BLOQUEIA SCROLL DO MOUSE E RODINHA
-    function blockWheel(e) {
-        if (isLoaderVisible()) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-    
-    // Aplica todos os bloqueios
-    mouseEvents.forEach(eventType => {
-        document.addEventListener(eventType, blockMouseEvent, true);
+    // Aguarda o carregamento completo da página
+    window.addEventListener("load", function () {
+        // Aguarda mais 100ms para garantir que tudo está pronto
+        setTimeout(function() {
+            // Animação de fade out do loader
+            loader.style.opacity = "0";
+            loader.style.transition = "opacity 0.3s";
+            
+            // Após a animação, remove o loader e os bloqueios
+            setTimeout(function() {
+                loader.style.display = "none";
+                removeAllBlocks();
+            }, 300);
+        }, 100);
     });
     
-    keyboardEvents.forEach(eventType => {
-        document.addEventListener(eventType, blockKeyboardEvent, true);
-    });
-    
-    // Bloqueia scroll da roda do mouse
-    document.addEventListener('wheel', blockWheel, { passive: false, capture: true });
-    document.addEventListener('touchmove', blockWheel, { passive: false, capture: true });
-    
-    // Remove todos os bloqueios quando o loader sumir
-    const observer = new MutationObserver(function() {
-        if (loader.style.display === "none") {
-            // Remove todos os bloqueios
-            mouseEvents.forEach(eventType => {
-                document.removeEventListener(eventType, blockMouseEvent, true);
-            });
-            keyboardEvents.forEach(eventType => {
-                document.removeEventListener(eventType, blockKeyboardEvent, true);
-            });
-            document.removeEventListener('wheel', blockWheel, true);
-            document.removeEventListener('touchmove', blockWheel, true);
-            observer.disconnect();
+    // Garantia extra: se algo demorar mais que 3 segundos, força remoção
+    setTimeout(function() {
+        if (loader.style.display !== "none") {
+            loader.style.display = "none";
+            removeAllBlocks();
         }
-    });
-    
-    observer.observe(loader, { attributes: true });
+    }, 3000);
 })();
 
-// Código original do loader
-window.addEventListener("load", function () {
+// BLOQUEIO EXTRA: Previne qualquer clique durante o load
+document.addEventListener('click', function(e) {
     const loader = document.getElementById("loader");
+    const overlay = document.getElementById("blockOverlay");
     
-    setTimeout(function() {
-        loader.style.opacity = "0";
-        loader.style.transition = "opacity 0.3s";
-        
-        setTimeout(function() {
-            loader.style.display = "none";
-        }, 300);
-    }, 100);
-});
+    // Se o overlay estiver visível, bloqueia TUDO
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+}, true); // true = fase de captura, antes de qualquer outro evento
+
+// Bloqueia também eventos de teclado durante o load
+document.addEventListener('keydown', function(e) {
+    const overlay = document.getElementById("blockOverlay");
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+}, true);
+
+// Bloqueia scroll durante o load
+document.addEventListener('wheel', function(e) {
+    const overlay = document.getElementById("blockOverlay");
+    if (overlay && overlay.style.display === "block") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+}, { passive: false, capture: true });
 </script>
 
 <script src="script.js"></script>
