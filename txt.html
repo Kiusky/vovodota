@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="VOVO DOTA">
+    <meta property="og:description" content="Sou o vovodota o vovo mais Viking da Internet">
+    <meta property="og:image" content="https://vovodota.com/imagem/ic-vovo.png">
+    <meta property="og:url" content="">
+    <title>Vovo Dota</title>
+
+    <link rel="icon" type="image/x-icon" href="https://vovodota.com/imagem/ic-vovo.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                #0a3b0a,
+                #0a1f3d,
+                #1a1a1a,
+                #3d0a0a
+            );
+            box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            /* IMPEDE QUALQUER CLIQUE NA PÁGINA ENQUANTO ESTIVER VISÍVEL */
+            pointer-events: auto;
+        }
+
+        .loader-icon {
+            width: 97px;
+            height: 97px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: .7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: .7; }
+        }
+
+        /* IMPEDIR SCROLL ENQUANTO LOADER ESTIVER ATIVO */
+        body.loading {
+            overflow: hidden;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <img src="imagem/ic-vovo.png" class="loader-icon" draggable="false">
+</div>
+
+<div id="audioControls">
+    <div id="muteBtn"><i class="fas fa-volume-mute" style="color:gray;"></i></div>
+    <div id="nextBtn" class="audio-control-btn hidden"><i class="fas fa-forward"></i></div>
+</div>
+
+<div class="wrapper">
+    <div class="container">
+
+        <img src="imagem/vovodota.gif" class="name-img" draggable="false">
+        <img src="imagem/vovo.png" class="fade-img clickable-img" draggable="false">
+
+        <a id="steamLink" class="btn steam" href="https://steamcommunity.com/profiles/76561198268358383/" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-steam"></i> Steam
+        </a>
+
+        <a id="discordLink" class="btn discord" href="https://discord.gg/puXGnwvEF5" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-discord"></i> Discord
+        </a>
+
+        <a class="btn youtube" href="https://www.youtube.com/@vovodota/live" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-youtube"></i> YouTube
+        </a>
+
+        <a class="btn tiktok" href="https://www.tiktok.com/@vovodota5" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-tiktok"></i> TikTok
+        </a>
+
+        <a class="btn instagram" href="https://www.instagram.com/vovodota/" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i> Instagram
+        </a>
+
+        <a class="btn twitch" href="https://www.twitch.tv/vovodota" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-twitch"></i> Twitch
+        </a>
+
+        <a class="btn whatsapp" 
+           href="https://chat.whatsapp.com/Eq7Jd52R6zYCAg13h5RDUT" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           style="background:#158f43; color:white; transition:0.3s;">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+
+    </div>
+</div>
+
+<script>
+window.addEventListener("load", function () {
+    const loader = document.getElementById("loader");
+    
+    // Pequeno delay para garantir que tudo foi processado
+    setTimeout(function() {
+        loader.style.opacity = "0";
+        
+        // Aguarda a transição de opacidade e remove o loader
+        setTimeout(function() {
+            loader.style.display = "none";
+            // Remove a classe de scroll bloqueado
+            document.body.classList.remove("loading");
+        }, 300);
+    }, 100);
+});
+
+// IMPEDIR INTERAÇÃO ENQUANTO LOADER ESTIVER NA TELA
+(function() {
+    const loader = document.getElementById("loader");
+    
+    // Adiciona classe no body para bloquear scroll
+    document.body.classList.add("loading");
+    
+    // Bloqueia todos os cliques nos links e botões enquanto loader estiver visível
+    function bloquearCliques(event) {
+        // Se o loader ainda está visível (display não é none)
+        if (loader && loader.style.display !== "none") {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    }
+    
+    // Bloqueia cliques em toda a página
+    document.addEventListener("click", bloquearCliques, true);
+    document.addEventListener("touchstart", bloquearCliques, true);
+    
+    // Remove o bloqueio quando o loader sumir
+    const observer = new MutationObserver(function() {
+        if (loader.style.display === "none") {
+            document.removeEventListener("click", bloquearCliques, true);
+            document.removeEventListener("touchstart", bloquearCliques, true);
+            observer.disconnect();
+        }
+    });
+    
+    observer.observe(loader, { attributes: true });
+})();
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
