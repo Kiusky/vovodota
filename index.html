@@ -218,6 +218,10 @@
                 wrapper.classList.add('loaded');
                 body.classList.remove('loading');
                 body.classList.add('loaded');
+                
+                const script = document.createElement('script');
+                script.src = 'script.js';
+                document.body.appendChild(script);
             }, 500);
         }
     }
@@ -247,6 +251,5 @@
 })();
 </script>
 
-<script src="script.js"></script>
 </body>
 </html>
