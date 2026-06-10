@@ -13,8 +13,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        * {
-            user-select: none;
+        body.loading {
+            overflow: hidden;
+            pointer-events: none;
+            cursor: wait;
+        }
+        
+        body.loaded {
+            overflow: auto;
+            pointer-events: auto;
+            cursor: default;
         }
         
         #loader {
@@ -29,19 +37,18 @@
             justify-content: center;
             align-items: center;
             z-index: 999999;
-            pointer-events: all;
+            transition: opacity 0.3s ease;
         }
 
-        #blockOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            z-index: 999998;
-            display: none;
-            pointer-events: all;
+        .wrapper {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .wrapper.loaded {
+            opacity: 1;
+            visibility: visible;
         }
 
         .loader-icon {
@@ -56,16 +63,51 @@
             100% { transform: scale(1); opacity: .7; }
         }
         
-        body.loading {
-            pointer-events: none;
+        .countdown-container {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: -10px;
         }
-        
-        body.loading .container {
-            pointer-events: none;
+
+        .countdown-container.hidden {
+            display: none;
         }
-        
-        body.loaded {
-            pointer-events: auto;
+
+        @keyframes alarmPulse {
+            0% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
+            50% { text-shadow: 0 0 10px black, 0 0 15px #ff0000, 0 0 5px #ff6600; opacity: 0.85; color: #ff8888; }
+            100% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 30px;
+            margin: 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .btn {
+                min-width: 150px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -74,8 +116,6 @@
 <div id="loader">
     <img src="imagem/ic-vovo.png" class="loader-icon" draggable="false">
 </div>
-
-<div id="blockOverlay"></div>
 
 <div id="audioControls">
     <div id="muteBtn"><i class="fas fa-volume-mute" style="color:gray;"></i></div>
@@ -88,25 +128,15 @@
         <img src="imagem/vovodota.gif" class="name-img" draggable="false">
         
         <div style="text-align: center;">
-            <img src="imagem/vovo-N0.png" class="fade-img clickable-img" draggable="false">
+            <img src="imagem/vovo.png" class="fade-img clickable-img" draggable="false">
             
-            <div style="background: rgba(0, 0, 0, 0.2);"></div>
-            
-            <div style="display: inline-block; background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 10px; margin-top: -10px;">
+            <div class="countdown-container" id="countdownContainer">
                 <p id="alarmText" style="color: #ff4444; font-family: 'Arial', sans-serif; font-size: 20px; margin: 0; font-weight: bold; animation: alarmPulse 1s infinite;">
-                    <span>Faltam</span>
+                    <span id="countdownPrefix">Faltam</span>
                     <span id="countdown" style="margin-left: 8px;">calculando...</span>
                 </p>
             </div>
         </div>
-
-        <style>
-            @keyframes alarmPulse {
-                0% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
-                50% { text-shadow: 0 0 10px black, 0 0 15px #ff0000, 0 0 5px #ff6600; opacity: 0.85; color: #ff8888; }
-                100% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
-            }
-        </style>
 
         <a id="steamLink" class="btn steam" href="https://steamcommunity.com/profiles/76561198268358383/" target="_blank" rel="noopener noreferrer">
             <i class="fab fa-steam"></i> Steam
@@ -144,122 +174,25 @@
 </div>
 
 <script>
-const ANIVERSARIO_MES = 6;
-const ANIVERSARIO_DIA = 16;
-
-function isAniversarioHoje(data) {
-    return data.getMonth() + 1 === ANIVERSARIO_MES && data.getDate() === ANIVERSARIO_DIA;
-}
-
-function updateCountdown() {
-    const hoje = new Date();
-    const anoAtual = hoje.getFullYear();
-    let dataAniversario = new Date(anoAtual, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
-    
-    if (hoje > dataAniversario && !isAniversarioHoje(hoje)) {
-        dataAniversario = new Date(anoAtual + 1, ANIVERSARIO_MES - 1, ANIVERSARIO_DIA);
-    }
-    
-    const diff = dataAniversario - hoje;
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diff % 86400000) / 3600000);
-    const minutos = Math.floor((diff % 3600000) / 60000);
-    const segundos = Math.floor((diff % 60000) / 1000);
-    
-    const countdownElement = document.getElementById('countdown');
-    const alarmTextElement = document.getElementById('alarmText');
-    const spanElement = alarmTextElement.querySelector('span:first-child');
-    
-    if (isAniversarioHoje(hoje)) {
-        spanElement.innerHTML = '🎉';
-        countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
-        alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
-    } else if (dias === 0 && horas === 0 && minutos === 0 && segundos < 30) {
-        spanElement.innerHTML = '🎉';
-        countdownElement.innerHTML = 'Hoje é o dia do VOVO! 🎂';
-        alarmTextElement.style.animation = "alarmPulse 0.3s infinite";
-    } else if (dias === 0) {
-        spanElement.innerHTML = 'Faltam';
-        countdownElement.innerHTML = `${horas}h ${minutos}m ${segundos}s`;
-    } else {
-        spanElement.innerHTML = 'Faltam';
-        countdownElement.innerHTML = `${dias} dias, ${horas}h ${minutos}m ${segundos}s`;
-    }
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
 (function() {
-    const loader = document.getElementById("loader");
-    const blockOverlay = document.getElementById("blockOverlay");
+    const loader = document.getElementById('loader');
+    const wrapper = document.querySelector('.wrapper');
     
-    blockOverlay.style.display = "block";
-    
-    function removeAllBlocks() {
-        if (blockOverlay) {
-            blockOverlay.style.display = "none";
-        }
-        
-        document.body.classList.remove("loading");
-        document.body.classList.add("loaded");
-        
-        document.body.style.pointerEvents = "auto";
+    function finishLoading() {
+        loader.style.opacity = '0';
         
         setTimeout(() => {
-            window.getComputedStyle(document.body);
-        }, 10);
+            loader.style.display = 'none';
+            wrapper.classList.add('loaded');
+            document.body.classList.remove('loading');
+            document.body.classList.add('loaded');
+        }, 300);
     }
     
-    window.addEventListener("load", function () {
-        setTimeout(function() {
-            loader.style.opacity = "0";
-            loader.style.transition = "opacity 0.3s";
-            
-            setTimeout(function() {
-                loader.style.display = "none";
-                removeAllBlocks();
-            }, 300);
-        }, 100);
-    });
+    window.addEventListener('load', finishLoading);
     
-    setTimeout(function() {
-        if (loader.style.display !== "none") {
-            loader.style.display = "none";
-            removeAllBlocks();
-        }
-    }, 3000);
+    setTimeout(finishLoading, 3000);
 })();
-
-document.addEventListener('click', function(e) {
-    const overlay = document.getElementById("blockOverlay");
-    
-    if (overlay && overlay.style.display === "block") {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-}, true);
-
-document.addEventListener('keydown', function(e) {
-    const overlay = document.getElementById("blockOverlay");
-    if (overlay && overlay.style.display === "block") {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-}, true);
-
-document.addEventListener('wheel', function(e) {
-    const overlay = document.getElementById("blockOverlay");
-    if (overlay && overlay.style.display === "block") {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-}, { passive: false, capture: true });
 </script>
 
 <script src="script.js"></script>
