@@ -186,76 +186,8 @@
     </div>
 </div>
 
-<script>
-(function() {
-    const loader = document.getElementById('loader');
-    const wrapper = document.querySelector('.wrapper');
-    const body = document.body;
-    
-    let totalAssets = 0;
-    let loadedAssets = 0;
-    
-    const imagens = [
-        'imagem/ic-vovo.png',
-        'imagem/vovodota.gif',
-        'imagem/vovo.png',
-        'imagem/fundo.jpg',
-        'imagem/mouse.cur',
-        'imagem/livepix.png',
-        'imagem/sangue.png'
-    ];
-    
-    const audios = [
-        'audio/intro.mp3',
-        'audio/musica1.mp3',
-        'audio/musica2.mp3',
-        'audio/musica3.mp3',
-        'audio/tic.mp3',
-        'audio/clic.mp3',
-        'audio/machado.mp3',
-        'audio/voz.mp3',
-        'audio/pedra.mp3'
-    ];
-    
-    totalAssets = imagens.length + audios.length;
-    
-    function assetLoaded() {
-        loadedAssets++;
-        if (loadedAssets >= totalAssets) {
-            loader.classList.add('hide');
-            setTimeout(() => {
-                loader.style.display = 'none';
-                wrapper.classList.add('loaded');
-                body.classList.remove('loading');
-                body.classList.add('loaded');
-            }, 500);
-        }
-    }
-    
-    imagens.forEach(src => {
-        const img = new Image();
-        img.onload = assetLoaded;
-        img.onerror = assetLoaded;
-        img.src = src;
-    });
-    
-    audios.forEach(src => {
-        const audio = new Audio();
-        audio.preload = 'auto';
-        audio.oncanplaythrough = assetLoaded;
-        audio.onerror = assetLoaded;
-        audio.src = src;
-        audio.load();
-    });
-    
-    setTimeout(() => {
-        if (loadedAssets < totalAssets) {
-            loadedAssets = totalAssets;
-            assetLoaded();
-        }
-    }, 8000);
-})();
-</script>
+<script>(function(){const loader=document.getElementById('loader');const wrapper=document.querySelector('.wrapper');const body=document.body;let totalAssets=0;let loadedAssets=0;const imagens=['imagem/ic-vovo.png','imagem/vovodota.gif','imagem/vovo.png','imagem/fundo.jpg','imagem/mouse.cur','imagem/livepix.png','imagem/sangue.png'];const audios=['audio/intro.mp3','audio/musica1.mp3','audio/musica2.mp3','audio/musica3.mp3','audio/tic.mp3','audio/clic.mp3','audio/machado.mp3','audio/voz.mp3','audio/pedra.mp3'];totalAssets=imagens.length+audios.length;function assetLoaded(){loadedAssets++;if(loadedAssets>=totalAssets){loader.classList.add('hide');setTimeout(()=>{loader.style.display='none';wrapper.classList.add('loaded');body.classList.remove('loading');body.classList.add('loaded')},500)}}
+imagens.forEach(src=>{const img=new Image();img.onload=assetLoaded;img.onerror=assetLoaded;img.src=src});audios.forEach(src=>{const audio=new Audio();audio.preload='auto';audio.oncanplaythrough=assetLoaded;audio.onerror=assetLoaded;audio.src=src;audio.load()});setTimeout(()=>{if(loadedAssets<totalAssets){loadedAssets=totalAssets;assetLoaded()}},8000)})()</script>
 
 <script src="script.js"></script>
 </body>
