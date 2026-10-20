@@ -12,109 +12,7 @@
     <link rel="icon" type="image/x-icon" href="https://vovodota.com/imagem/ic-vovo.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        body.loading {
-            overflow: hidden;
-            pointer-events: none;
-            cursor: wait;
-        }
-        
-        body.loaded {
-            overflow: auto;
-            pointer-events: auto;
-            cursor: default;
-        }
-        
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to right, #0a3b0a, #0a1f3d, #1a1a1a, #3d0a0a);
-            box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.55);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 999999;
-            transition: opacity 0.5s ease;
-        }
-
-        #loader.hide {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .wrapper {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        
-        .wrapper.loaded {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .loader-icon {
-            width: 97px;
-            height: 97px;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: .7; }
-            50% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: .7; }
-        }
-        
-        .countdown-container {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-top: -10px;
-        }
-
-        .countdown-container.hidden {
-            display: none;
-        }
-
-        @keyframes alarmPulse {
-            0% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
-            50% { text-shadow: 0 0 10px black, 0 0 15px #ff0000, 0 0 5px #ff6600; opacity: 0.85; color: #ff8888; }
-            100% { text-shadow: 0 0 5px black, 0 0 0px #ff0000; opacity: 1; color: #ff4444; }
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 12px 30px;
-            margin: 10px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            min-width: 200px;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            filter: brightness(1.05);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
-
-        @media (max-width: 768px) {
-            .btn {
-                min-width: 150px;
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-        }
-    </style>
+    <style>body.loading{overflow:hidden;pointer-events:none;cursor:wait}body.loaded{overflow:auto;pointer-events:auto;cursor:default}#loader{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(to right,#0a3b0a,#0a1f3d,#1a1a1a,#3d0a0a);box-shadow:inset 0 0 0 2000px rgba(0,0,0,.55);display:flex;justify-content:center;align-items:center;z-index:999999;transition:opacity .5s}#loader.hide{opacity:0;pointer-events:none}.wrapper{opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}.wrapper.loaded{opacity:1;visibility:visible}.loader-icon{width:97px;height:97px;animation:1.5s ease-in-out infinite pulse}@keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}.countdown-container{display:inline-block;background:rgba(0,0,0,.7);padding:8px 12px;border-radius:10px;margin-top:-10px}.countdown-container.hidden{display:none}@keyframes alarmPulse{0%,100%{text-shadow:0 0 5px #000,0 0 0 red;opacity:1;color:#f44}50%{text-shadow:0 0 10px #000,0 0 15px red,0 0 5px #f60;opacity:.85;color:#f88}}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 30px;margin:10px;border-radius:50px;text-decoration:none;font-weight:700;font-size:18px;transition:.3s;min-width:200px}.btn:hover{transform:translateY(-3px);filter:brightness(1.05);box-shadow:0 5px 20px rgba(0,0,0,.3)}@media (max-width:768px){.btn{min-width:150px;padding:10px 20px;font-size:14px}}</style>
 </head>
 <body class="loading">
 
@@ -186,8 +84,7 @@
     </div>
 </div>
 
-<script>(function(){const loader=document.getElementById('loader');const wrapper=document.querySelector('.wrapper');const body=document.body;let totalAssets=0;let loadedAssets=0;const imagens=['imagem/ic-vovo.png','imagem/vovodota.gif','imagem/vovo.png','imagem/fundo.jpg','imagem/mouse.cur','imagem/livepix.png','imagem/sangue.png'];const audios=['audio/intro.mp3','audio/musica1.mp3','audio/musica2.mp3','audio/musica3.mp3','audio/tic.mp3','audio/clic.mp3','audio/machado.mp3','audio/voz.mp3','audio/pedra.mp3'];totalAssets=imagens.length+audios.length;function assetLoaded(){loadedAssets++;if(loadedAssets>=totalAssets){loader.classList.add('hide');setTimeout(()=>{loader.style.display='none';wrapper.classList.add('loaded');body.classList.remove('loading');body.classList.add('loaded')},500)}}
-imagens.forEach(src=>{const img=new Image();img.onload=assetLoaded;img.onerror=assetLoaded;img.src=src});audios.forEach(src=>{const audio=new Audio();audio.preload='auto';audio.oncanplaythrough=assetLoaded;audio.onerror=assetLoaded;audio.src=src;audio.load()});setTimeout(()=>{if(loadedAssets<totalAssets){loadedAssets=totalAssets;assetLoaded()}},8000)})()</script>
+<script>!function(){const o=document.getElementById("loader"),e=document.querySelector(".wrapper"),a=document.body;let d=0,i=0;const m=["imagem/ic-vovo.png","imagem/vovodota.gif","imagem/vovo.png","imagem/fundo.jpg","imagem/mouse.cur","imagem/livepix.png","imagem/sangue.png"],n=["audio/intro.mp3","audio/musica1.mp3","audio/musica2.mp3","audio/musica3.mp3","audio/tic.mp3","audio/clic.mp3","audio/machado.mp3","audio/voz.mp3","audio/pedra.mp3"],t=["video/steam-inf.webm","video/discord-inf.webm"];function c(){i++,i>=d&&(o.classList.add("hide"),setTimeout(()=>{o.style.display="none",e.classList.add("loaded"),a.classList.remove("loading"),a.classList.add("loaded")},500))}d=m.length+n.length+t.length,m.forEach(o=>{const e=new Image;e.onload=c,e.onerror=c,e.src=o}),n.forEach(o=>{const e=new Audio;e.preload="auto",e.oncanplaythrough=c,e.onerror=c,e.src=o,e.load()}),t.forEach(o=>{const e=document.createElement("video");e.preload="auto",e.src=o,e.load(),e.oncanplaythrough=c,e.onerror=c}),setTimeout(()=>{i<d&&(i=d,c())},8e3)}();</script>
 
 <script src="script.js"></script>
 </body>
